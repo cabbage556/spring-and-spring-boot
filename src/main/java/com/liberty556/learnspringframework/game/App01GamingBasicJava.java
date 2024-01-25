@@ -1,4 +1,4 @@
-package com.liberty556.learnspringframework;
+package com.liberty556.learnspringframework.game;
 
 import com.liberty556.learnspringframework.game.GameRunner;
 import com.liberty556.learnspringframework.game.PacmanGame;
