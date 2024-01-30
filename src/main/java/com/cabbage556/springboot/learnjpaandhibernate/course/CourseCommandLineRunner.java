@@ -1,6 +1,7 @@
-package com.cabbage556.springboot.learnjpaandhibernate.course.jdbc;
+package com.cabbage556.springboot.learnjpaandhibernate.course;
 
-import com.cabbage556.springboot.learnjpaandhibernate.course.Course;
+import com.cabbage556.springboot.learnjpaandhibernate.course.jdbc.CourseJdbcRepository;
+import com.cabbage556.springboot.learnjpaandhibernate.course.jpa.CourseJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -9,10 +10,15 @@ import org.springframework.stereotype.Component;
 //      스프링 빈이 SpringApplication 안에 포함되어 있을 때 실행되어야 함을 나타내기 위해 사용하는 인터페이스
 //      즉 스프링 애플리케이션 시작 시 실행될 로직이 있을 때 CommandLineRunner 인터페이스 활용 가능
 @Component
-public class CourseJdbcCommandLineRunner implements CommandLineRunner {
+public class CourseCommandLineRunner implements CommandLineRunner {
 
+    // JDBC 레포지토리 의존성
+    // @Autowired
+    // private CourseJdbcRepository repository;
+
+    // JPA 레포지토리 의존성
     @Autowired
-    private CourseJdbcRepository repository;
+    private CourseJpaRepository repository;
 
     // 애플리케이션 시작 시 실행
     @Override

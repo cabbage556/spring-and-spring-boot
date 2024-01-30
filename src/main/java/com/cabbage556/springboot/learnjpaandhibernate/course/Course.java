@@ -1,8 +1,14 @@
 package com.cabbage556.springboot.learnjpaandhibernate.course;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
+@Entity  // 스프링 빈 - 테이블 매핑
 public class Course {
 
+    @Id // PK
     private long id;
+
     private String name;
     private String author;
 
