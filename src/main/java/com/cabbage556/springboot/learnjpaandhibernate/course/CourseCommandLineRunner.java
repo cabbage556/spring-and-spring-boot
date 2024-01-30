@@ -2,6 +2,7 @@ package com.cabbage556.springboot.learnjpaandhibernate.course;
 
 import com.cabbage556.springboot.learnjpaandhibernate.course.jdbc.CourseJdbcRepository;
 import com.cabbage556.springboot.learnjpaandhibernate.course.jpa.CourseJpaRepository;
+import com.cabbage556.springboot.learnjpaandhibernate.course.springdatajpa.CourseSpringDataJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -17,19 +18,41 @@ public class CourseCommandLineRunner implements CommandLineRunner {
     // private CourseJdbcRepository repository;
 
     // JPA 레포지토리 의존성
+    // @Autowired
+    // private CourseJpaRepository repository;
+
+    // Spring Data JPA 레포지토리 의존성
     @Autowired
-    private CourseJpaRepository repository;
+    private CourseSpringDataJpaRepository repository;
 
     // 애플리케이션 시작 시 실행
     @Override
     public void run(String... args) throws Exception {
-        repository.insert(new Course(1, "Learn AWS", "in28minutes")); // insert 쿼리 실행
-        repository.insert(new Course(2, "Learn Azure", "in28minutes")); // insert 쿼리 실행
-        repository.insert(new Course(3, "Learn DevOps", "in28minutes")); // insert 쿼리 실행
+        // JDBC, JPA insert
+        // repository.insert(new Course(1, "Learn AWS", "in28minutes")); // insert 쿼리 실행
+        // repository.insert(new Course(2, "Learn Azure", "in28minutes")); // insert 쿼리 실행
+        // repository.insert(new Course(3, "Learn DevOps", "in28minutes")); // insert 쿼리 실행
 
-        repository.deleteById(1); // delete 쿼리 실행
+        // Spring Data JPA insert
+        repository.save(new Course(1, "Learn AWS", "in28minutes"));
+        repository.save(new Course(2, "Learn Azure", "in28minutes"));
+        repository.save(new Course(3, "Learn DevOps", "in28minutes"));
 
-        System.out.println(repository.findById(2)); // select 쿼리 실행
-        System.out.println(repository.findById(3)); // select 쿼리 실행
+        // Spring Data JPA deleteById 메서드 제공
+        repository.deleteById(1L); // delete 쿼리 실행
+
+        // Spring Data JPA findById 메서드 제공
+        System.out.println(repository.findById(2L)); // select 쿼리 실행
+        System.out.println(repository.findById(3L)); // select 쿼리 실행
+
+        // 다양한 메서드 제공
+        System.out.println(repository.findAll());
+        System.out.println(repository.count());
+
+        // 커스텀 메서드 사용
+        System.out.println(repository.findByAuthor("in28minutes"));
+        System.out.println(repository.findByAuthor(""));
+        System.out.println(repository.findByName("Learn AWS"));
+        System.out.println(repository.findByName("Learn DevOps"));
     }
 }
