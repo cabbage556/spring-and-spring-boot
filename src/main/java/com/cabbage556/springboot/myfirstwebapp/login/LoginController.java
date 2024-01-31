@@ -1,30 +1,40 @@
 package com.cabbage556.springboot.myfirstwebapp.login;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class LoginController {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private AuthenticationService authenticationService;
 
-    @RequestMapping("login")
-    public String login(
-            @RequestParam String name, // name 요청 쿼리 파라미터
-            ModelMap model // 컨트롤러에서 뷰에 뭔가를 제공하기 위해 사용
-    ) {
-        // JSP에 name 요청 쿼리 파라미터의 값 제공하기
-        model.put("name", name); // JSP: ${name}
+    public LoginController(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
+    }
 
-        // debug 수준 로깅
-        logger.debug("Request param : {}", name);
-
+    @RequestMapping(value = "login", method = RequestMethod.GET)
+    public String goToLoginPage() {
         // 스프링 MVC ViewResolver
         // 스프링 부트 JSP 기본 폴더 + prefix + 메서드 리턴 + suffix => 리다이렉션
         return "login";
+    }
+
+    @RequestMapping(value = "login", method = RequestMethod.POST)
+    public String goToWelcomePage(
+            @RequestParam String name,
+            @RequestParam String password,
+            ModelMap model
+    ) {
+        if (!authenticationService.authenticate(name, password)) {
+            model.put("errorMessage", "Invalid Credentials! Please try agian.");
+            return "login";
+        }
+
+        model.put("name", name);
+        return "welcome";
     }
 }
