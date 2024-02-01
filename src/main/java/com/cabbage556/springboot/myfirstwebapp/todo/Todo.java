@@ -22,6 +22,8 @@ public class Todo {
     private LocalDate targetDate; // 날짜 저장: Date 대신 LocalDate 사용 권장
     private boolean done;
 
+    public Todo() {}
+
     public Todo(int id, String username, String description, LocalDate targetDate, boolean done) {
         this.id = id;
         this.username = username;

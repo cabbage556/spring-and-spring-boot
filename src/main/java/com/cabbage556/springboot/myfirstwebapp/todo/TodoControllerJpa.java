@@ -14,19 +14,19 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import java.time.LocalDate;
 import java.util.List;
 
-// @Controller
+@Controller
 @SessionAttributes("name")  // WelcomeController에서 세션에 추가한 name 데이터를 가져오기 위해 사용
-public class TodoController {
+public class TodoControllerJpa {
 
-    private TodoService todoService;
+    private TodoRepository todoRepository;
 
-    public TodoController(TodoService todoService) {
-        this.todoService = todoService;
+    public TodoControllerJpa(TodoRepository todoRepository) {
+        this.todoRepository = todoRepository;
     }
 
     @RequestMapping("list-todos")
     public String listAllTodos(ModelMap model) {
-        List<Todo> todos = todoService.findByUsername(getLoggedInUsername());
+        List<Todo> todos = todoRepository.findByUsername(getLoggedInUsername());
         model.put("todos", todos);
 
         return "listTodos";
@@ -52,7 +52,8 @@ public class TodoController {
             return "todo";
         }
 
-        todoService.addTodo(getLoggedInUsername(), todo.getDescription(), todo.getTargetDate(), false);
+        todo.setUsername(getLoggedInUsername());
+        todoRepository.save(todo);
 
         // /list-todos URL로 리다이렉트
         return "redirect:list-todos";
@@ -60,14 +61,14 @@ public class TodoController {
 
     @RequestMapping("delete-todo")
     public String deleteTodo(@RequestParam int id) {
-        todoService.deleteById(id);
+        todoRepository.deleteById(id);
         return "redirect:list-todos";
     }
 
     @RequestMapping(value = "update-todo", method = RequestMethod.GET)
     public String showUpdateTodoPage(@RequestParam int id, ModelMap model) {
         // todo.jsp의 form 태그에 바인딩
-        Todo todo = todoService.findById(id);
+        Todo todo = todoRepository.findById(id).get();
         model.addAttribute("todo", todo);
 
         return "todo";
@@ -86,7 +87,7 @@ public class TodoController {
 
         // 업데이트
         todo.setUsername(getLoggedInUsername());
-        todoService.updateTodo(todo);
+        todoRepository.save(todo);
 
         // /list-todos URL로 리다이렉트
         return "redirect:list-todos";
