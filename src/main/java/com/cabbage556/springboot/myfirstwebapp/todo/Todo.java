@@ -1,11 +1,20 @@
 package com.cabbage556.springboot.myfirstwebapp.todo;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
+// Todo Bean -> DB Table 매핑
+// 스프링 부트는 H2 데이터베이스를 발견하면 즉시 사전 설정을 진행
+//      사전 설정 과정에서 Entity를 발견하면 테이블 생성
+@Entity
 public class Todo {
 
+    @Id
+    @GeneratedValue
     private int id;
     private String username;
     @Size(min = 10, message = "Enter at least 10 characters")  // 검증 추가: 최소 글자 수
