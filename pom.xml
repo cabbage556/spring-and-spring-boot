@@ -44,6 +44,13 @@
 <!--			<artifactId>jackson-dataformat-xml</artifactId>-->
 <!--		</dependency>-->
 
+		<!-- Spring HATEOAS 의존성  -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-hateoas</artifactId>
+		</dependency>
+
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>

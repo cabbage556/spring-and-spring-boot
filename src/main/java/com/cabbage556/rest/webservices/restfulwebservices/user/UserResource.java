@@ -1,6 +1,8 @@
 package com.cabbage556.rest.webservices.restfulwebservices.user;
 
 import jakarta.validation.Valid;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -22,13 +24,21 @@ public class UserResource {
         return userDaoService.findAll();
     }
 
+    // Spring HATEOAS: HAL 응답 생성하기
+    //      EntityModel + WebMvcLinkBuilder
     @GetMapping(path = "/users/{id}")
-    public User retrieveUser(@PathVariable int id) {
+    public EntityModel<User> retrieveUser(@PathVariable int id) {
         User user = userDaoService.findOne(id);
         if (user == null) {
             throw new UserNotFoundException("id: " + id);
         }
-        return user;
+
+        // 리소스에 대한 하이퍼링크를 갖는 HAL 응답 생성
+        EntityModel<User> entityModel = EntityModel.of(user); // 사용자 리소스에 대한 HAL 엔티티 모델 생성
+        WebMvcLinkBuilder link =
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).retrieveAllUsers()); // retrieveAllUsers에 대한 링크 생성
+        entityModel.add(link.withRel("all-users")); // all-users 라는 이름으로 링크 추가
+        return entityModel;
     }
 
     @PostMapping(path = "/users")
