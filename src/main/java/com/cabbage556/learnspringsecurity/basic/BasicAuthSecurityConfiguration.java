@@ -18,7 +18,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.sql.DataSource;
 
-@Configuration
+// @Configuration
 public class BasicAuthSecurityConfiguration {
 
     // 필터 체인 재정의
