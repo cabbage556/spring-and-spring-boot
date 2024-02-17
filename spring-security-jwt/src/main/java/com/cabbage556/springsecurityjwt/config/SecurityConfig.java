@@ -39,7 +39,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/login", "/", "/join").permitAll()  // 해당 경로 모든 요청 허용
                         .requestMatchers("/admin").hasRole("ADMIN")           // 해당 경로 ADMIN role 요구
-                        .anyRequest().authenticated());                                // 나머지 모든 경로 인증 요구
+                        .anyRequest().authenticated()                                  // 나머지 모든 경로 인증 요구
+                );
 
         // 세션 설정
         //      ****JWT 방식에서 Stateless한 세션 설정****
