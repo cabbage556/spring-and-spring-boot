@@ -27,6 +27,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         // DB에서 유저가 조회된다면 CustomUserDetails 객체 리턴
+        // password 검증의 경우
+        //      AuthenticationManager의 구현체인 ProviderManager,
+        //      AuthenticationProvider의 구현체인 DaoAuthenticationProvider에서 진행
+        //      CustomUserDetails는 ProviderManager 쪽으로 데이터를 넘겨주는 역할
         return new CustomUserDetails(user);
     }
 }
