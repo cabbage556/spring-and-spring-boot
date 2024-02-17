@@ -1,16 +1,27 @@
 package com.cabbage556.springsecurityjwt.config;
 
+import com.cabbage556.springsecurityjwt.jwt.LoginFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration      // configuration 클래스
 @EnableWebSecurity  // Security 클래스
 public class SecurityConfig {
+
+    // AuthenticationManager 의존성 생성자 주입
+    private final AuthenticationConfiguration authenticationConfiguration;
+
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration) {
+        this.authenticationConfiguration = authenticationConfiguration;
+    }
 
     // bcrypt 해시된 패스워드를 DB에 저장
     @Bean
@@ -18,7 +29,13 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // 필터 체인 재정의
+    // AuthenticationManager 스프링 빈 등록
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+
+    // JWT 기반 인증 및 인가에 사용할 필터 체인 재정의
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // disable csrf
@@ -27,12 +44,23 @@ public class SecurityConfig {
                 .csrf((auth) -> auth.disable());
 
         // disable form login
+        //      UsernamePasswordAuthenticationFilter가 비활성화됨 -> LoginFilter 구현
         http
                 .formLogin((auth) -> auth.disable());
 
-        // disable htt basic authentication
+        // disable http basic authentication
+        //      Basic 토큰이 아닌 JWT 사용
         http
                 .httpBasic((auth) -> auth.disable());
+
+        // LoginFilter 추가
+        //      UsernamePasswordAuthenticationFilter 자리에 추가
+        //      LoginFilter -> AuthenticationManager -> AuthenticationConfiguration
+        http
+                .addFilterAt(
+                        new LoginFilter(authenticationManager(authenticationConfiguration)),
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         // 경로별 인가 설정
         http
