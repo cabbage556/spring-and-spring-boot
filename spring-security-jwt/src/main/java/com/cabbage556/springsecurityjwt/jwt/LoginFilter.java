@@ -31,6 +31,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         // AuthenticationManager에게 인증 위임
         //      UsernamePasswordAuthenticationToken 전달
+        //      AuthenticationManager는 UserDetailsService의 구현체를 찾고 내부의 loadUserByUsername 메서드 실행
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(username, password, null);
         return authenticationManager.authenticate(authToken);
@@ -41,6 +42,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+        System.out.println("success");
     }
 
 
@@ -48,5 +50,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+        System.out.println("fail");
     }
 }
