@@ -1,5 +1,6 @@
 package com.cabbage556.springsecurityjwt.config;
 
+import com.cabbage556.springsecurityjwt.jwt.JWTUtil;
 import com.cabbage556.springsecurityjwt.jwt.LoginFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,11 +20,15 @@ public class SecurityConfig {
     // AuthenticationManager 의존성 생성자 주입
     private final AuthenticationConfiguration authenticationConfiguration;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration) {
+    // LoginFilter 의존성 생성자 주입
+    private final JWTUtil jwtUtil;
+
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil) {
         this.authenticationConfiguration = authenticationConfiguration;
+        this.jwtUtil = jwtUtil;
     }
 
-    // bcrypt 해시된 패스워드를 DB에 저장
+    // bcrypt 해시된 패스워드를 DB에 저장하기 위해 스프링 빈 등록
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
@@ -55,10 +60,9 @@ public class SecurityConfig {
 
         // LoginFilter 추가
         //      UsernamePasswordAuthenticationFilter 자리에 추가
-        //      LoginFilter -> AuthenticationManager -> AuthenticationConfiguration
         http
                 .addFilterAt(
-                        new LoginFilter(authenticationManager(authenticationConfiguration)),
+                        new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
                         UsernamePasswordAuthenticationFilter.class
                 );
 
