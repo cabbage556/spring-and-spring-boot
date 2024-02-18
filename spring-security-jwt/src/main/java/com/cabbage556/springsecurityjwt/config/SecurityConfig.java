@@ -1,5 +1,6 @@
 package com.cabbage556.springsecurityjwt.config;
 
+import com.cabbage556.springsecurityjwt.jwt.JWTFilter;
 import com.cabbage556.springsecurityjwt.jwt.JWTUtil;
 import com.cabbage556.springsecurityjwt.jwt.LoginFilter;
 import org.springframework.context.annotation.Bean;
@@ -57,6 +58,14 @@ public class SecurityConfig {
         //      Basic 토큰이 아닌 JWT 사용
         http
                 .httpBasic((auth) -> auth.disable());
+
+        // JWTFilter 추가
+        //      LoginFilter 이전에 추가
+        http
+                .addFilterBefore(
+                        new JWTFilter(jwtUtil),
+                        LoginFilter.class
+                );
 
         // LoginFilter 추가
         //      UsernamePasswordAuthenticationFilter 자리에 추가
