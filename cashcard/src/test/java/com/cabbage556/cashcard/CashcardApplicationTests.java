@@ -9,6 +9,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.net.URI;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 // @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -43,4 +45,25 @@ class CashcardApplicationTests {
 		assertThat(response.getBody()).isBlank();
 	}
 
+	@Test
+	void shouldCreateANewCashCard() {
+		CashCard newCashCard = new CashCard(null, 250.00);
+		ResponseEntity<Void> createResponse = restTemplate.postForEntity(  // POST 요청의 경우 CashCard를 돌려 받지 않으므로 Void 응답 바디로 선언함
+				"/cashcards",
+				newCashCard,
+				Void.class
+		);
+		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);  // POST 요청 성공의 경우 서버는 201 CREATED 상태 코드를 응답해야 함
+
+		URI locationOfNewCashCard = createResponse.getHeaders().getLocation();  // 201 CREATED 상태 코드는 Location 헤더 필드를 포함해야 함
+		ResponseEntity<String> getResponse = restTemplate.getForEntity(locationOfNewCashCard, String.class);
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+		// String 응답 -> JSON 인식 객체
+		DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
+		Number id = documentContext.read("$.id");           // id 필드 값 읽기
+		Double amount = documentContext.read("$.amount");   // amount 필드 값 읽기
+		assertThat(id).isNotNull();
+		assertThat(amount).isEqualTo(250.00);
+	}
 }
