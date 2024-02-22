@@ -1,5 +1,7 @@
 package com.cabbage556.cashcard;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -11,4 +13,8 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 // PagingAndSortingRepository
 //      스프링 데이터가 제공하는 paging, sorting 기능을 갖고 있는 인터페이스
 interface CashCardRepository extends CrudRepository<CashCard, Long>, PagingAndSortingRepository<CashCard, Long> {
+    // owner로 CashCard 데이터 필터링
+    CashCard findByIdAndOwner(Long id, String owner);
+
+    Page<CashCard> findByOwner(String owner, PageRequest pageRequest);
 }
