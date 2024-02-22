@@ -53,7 +53,7 @@ class CashcardApplicationTests {
 	@Test
 	@DirtiesContext  // 다른 테스트에 영향을 주지 않도록 CashCard 생성 후 클린 업(메서드 레벨 적용)
 	void shouldCreateANewCashCard() {
-		CashCard newCashCard = new CashCard(null, 250.00);
+		CashCard newCashCard = new CashCard(null, 250.00, "sarah1");
 		ResponseEntity<Void> createResponse = restTemplate.postForEntity(  // POST 요청의 경우 CashCard를 돌려 받지 않으므로 Void 응답 바디로 선언함
 				"/cashcards",
 				newCashCard,
