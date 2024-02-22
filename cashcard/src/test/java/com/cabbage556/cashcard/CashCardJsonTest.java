@@ -1,5 +1,7 @@
 package com.cabbage556.cashcard;
 
+import org.assertj.core.util.Arrays;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
@@ -20,15 +22,29 @@ public class CashCardJsonTest {
     @Autowired
     private JacksonTester<CashCard> json;
 
+    @Autowired
+    private JacksonTester<CashCard[]> jsonList;
+
+    private CashCard[] cashCards;
+
+    @BeforeEach
+    void setUp() {
+        cashCards = Arrays.array(
+                new CashCard(99L, 123.45),
+                new CashCard(100L, 1.00),
+                new CashCard(101L, 150.00)
+        );
+    }
+
     @Test
     void cashCardSerializationTest() throws IOException {
-        CashCard cashCard = new CashCard(99L, 123.45);
+        CashCard cashCard = cashCards[0];
 
-        // ClassLoader의 Resource를 사용해 expected.json 파일 읽기
+        // ClassLoader의 Resource를 사용해 single.json 파일 읽기
         ClassLoader classLoader = this.getClass().getClassLoader();
-        File expectedJson = new File(classLoader.getResource("com.cabbage556.cashcard/expected.json").getFile());
+        File expectedJson = new File(classLoader.getResource("com.cabbage556.cashcard/single.json").getFile());
 
-        // cashCard 객체의 직렬화 결과가 expected.json과 동일한지 테스트
+        // cashCard 객체의 직렬화 결과가 single.json과 동일한지 테스트
         //      직렬화: 자바 객체 -> json
         assertThat(json.write(cashCard)).isStrictlyEqualToJson(expectedJson);
         assertThat(json.write(cashCard)).hasJsonPathNumberValue("@.id");
@@ -56,5 +72,26 @@ public class CashCardJsonTest {
                 .isEqualTo(99);
         assertThat(json.parseObject(expected).amount())
                 .isEqualTo(123.45);
+    }
+
+    @Test
+    void cashCardListSerializationTest() throws IOException {
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        File expectedJson = new File(classLoader.getResource("com.cabbage556.cashcard/list.json").getFile());
+
+        // cashCards 변수의 값을 JSON으로 직렬화 후 list.json과 동일한지 테스트
+        assertThat(jsonList.write(cashCards)).isStrictlyEqualToJson(expectedJson);
+    }
+
+    @Test
+    void cashCardListDeserializationTest() throws IOException {
+        String expected = """
+                [
+                    { "id": 99, "amount": 123.45 },
+                    { "id": 100, "amount": 1.00 },
+                    { "id": 101, "amount": 150.00 }
+                ]
+                """;
+        assertThat(jsonList.parse(expected)).isEqualTo(cashCards);
     }
 }
