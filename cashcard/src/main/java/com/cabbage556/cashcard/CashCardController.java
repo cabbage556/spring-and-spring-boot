@@ -11,7 +11,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 
 @RestController  // RestController 타입의 Component이고, HTTP 요청을 처리할 수 있음을 명시함
 @RequestMapping("/cashcards")  // 컨트롤러에 접근하기 위해 필요한 주소
@@ -24,17 +23,15 @@ class CashCardController {
     }
 
     // 파라미터
-    //      Principal 객체: 유저의 인증, 권한 정보를 담고 있음
+    //      Principal 객체: 유저의 인증, 권한 정보를 담고 있음. 스프링 시큐리티에 의해 자동으로 제공됨
     @GetMapping("/{requestedId}")
     private ResponseEntity<CashCard> findById(@PathVariable Long requestedId, Principal principal) {
-        Optional<CashCard> cashCardOptional = Optional.ofNullable(
-                cashCardRepository.findByIdAndOwner(requestedId, principal.getName())  // principal.getName(): Basic Auth로부터 제공된 username 리턴
-        );
-        if (cashCardOptional.isPresent()) {
-            return ResponseEntity.ok(cashCardOptional.get());
-        } else {
+        CashCard cashCard = findCashCard(requestedId, principal);
+        if (cashCard == null) {
             return ResponseEntity.notFound().build();
         }
+
+        return ResponseEntity.ok(cashCard);
     }
 
     // 파라미터
@@ -73,5 +70,21 @@ class CashCardController {
                 )
         );
         return ResponseEntity.ok(page.getContent());
+    }
+
+    @PutMapping("/{requestedId}")
+    private ResponseEntity<Void> putCashCard(@PathVariable Long requestedId, @RequestBody CashCard cashCardUpdate, Principal principal) {
+        CashCard cashCard = findCashCard(requestedId, principal);
+        if (cashCard == null) {  // id에 해당하는 CashCard를 찾지 못하는 경우 404 NOT FOUND 응답
+            return ResponseEntity.notFound().build();
+        }
+
+        CashCard updatedCashCard = new CashCard(cashCard.id(), cashCardUpdate.amount(), principal.getName());
+        cashCardRepository.save(updatedCashCard);  // id 값을 갖는 레코드가 데이터베이스에 존재하면 업데이트
+        return ResponseEntity.noContent().build();
+    }
+
+    private CashCard findCashCard(Long requestedId, Principal principal) {
+        return cashCardRepository.findByIdAndOwner(requestedId, principal.getName());
     }
 }
